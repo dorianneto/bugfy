@@ -3,14 +3,15 @@ package router
 import (
 	"net/http"
 
-	userhandler "github.com/dorianneto/bugfy/internal/api/handler/user"
-	authmiddleware "github.com/dorianneto/bugfy/middleware"
+	projectH "github.com/dorianneto/bugfy/internal/api/handler/project"
+	userH "github.com/dorianneto/bugfy/internal/api/handler/user"
+	internalMiddleware "github.com/dorianneto/bugfy/middleware"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 )
 
-func SetupRouter(userH *userhandler.UserHandler) http.Handler {
+func SetupRouter(userHandler *userH.UserHandler, projectHandler *projectH.ProjectHandler) http.Handler {
 	r := chi.NewRouter()
 
 	r.Use(middleware.Logger)
@@ -27,13 +28,20 @@ func SetupRouter(userH *userhandler.UserHandler) http.Handler {
 	}))
 
 	r.Route("/api/users", func(u chi.Router) {
-		u.Post("/signup", userH.CreateUser)
-		// u.Post("/login", userH.Login)
-		// u.Get("/logout", userH.Logout)
+		u.Post("/signup", userHandler.CreateUser)
+		// u.Post("/login", userHandler.Login)
+		// u.Get("/logout", userHandler.Logout)
 
+		// u.Group(func(r chi.Router) {
+		// 	r.Use(internalMiddleware.JWTAuth)
+		// 	r.Put("/username", userHandler.UpdateUsername)
+		// })
+	})
+
+	r.Route("/api/projects", func(u chi.Router) {
 		u.Group(func(r chi.Router) {
-			r.Use(authmiddleware.JWTAuth)
-			// r.Put("/username", userH.UpdateUsername)
+			r.Use(internalMiddleware.JWTAuth)
+			r.Post("/", projectHandler.CreateProject)
 		})
 	})
 
