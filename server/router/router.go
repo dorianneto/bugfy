@@ -3,15 +3,15 @@ package router
 import (
 	"net/http"
 
+	errorH "github.com/dorianneto/bugfy/internal/api/handler/error"
 	projectH "github.com/dorianneto/bugfy/internal/api/handler/project"
 	userH "github.com/dorianneto/bugfy/internal/api/handler/user"
-	internalMiddleware "github.com/dorianneto/bugfy/middleware"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 )
 
-func SetupRouter(userHandler *userH.UserHandler, projectHandler *projectH.ProjectHandler) http.Handler {
+func SetupRouter(userHandler *userH.UserHandler, projectHandler *projectH.ProjectHandler, errorHandler *errorH.ErrorHandler) http.Handler {
 	r := chi.NewRouter()
 
 	r.Use(middleware.Logger)
@@ -40,8 +40,13 @@ func SetupRouter(userHandler *userH.UserHandler, projectHandler *projectH.Projec
 
 	r.Route("/api/projects", func(u chi.Router) {
 		u.Group(func(r chi.Router) {
-			r.Use(internalMiddleware.JWTAuth)
 			r.Post("/", projectHandler.CreateProject)
+		})
+	})
+
+	r.Route("/api/errors", func(u chi.Router) {
+		u.Group(func(r chi.Router) {
+			r.Post("/", errorHandler.CreateError)
 		})
 	})
 

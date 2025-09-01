@@ -7,10 +7,13 @@ import (
 	"net/http"
 
 	"github.com/dorianneto/bugfy/db"
+	errorH "github.com/dorianneto/bugfy/internal/api/handler/error"
 	projectH "github.com/dorianneto/bugfy/internal/api/handler/project"
 	userH "github.com/dorianneto/bugfy/internal/api/handler/user"
+	errorRepo "github.com/dorianneto/bugfy/internal/repository/error"
 	projectRepo "github.com/dorianneto/bugfy/internal/repository/project"
 	userRepo "github.com/dorianneto/bugfy/internal/repository/user"
+	errorServ "github.com/dorianneto/bugfy/internal/service/error"
 	projectServ "github.com/dorianneto/bugfy/internal/service/project"
 	userServ "github.com/dorianneto/bugfy/internal/service/user"
 	"github.com/dorianneto/bugfy/router"
@@ -36,14 +39,17 @@ func main() {
 
 	userRepo := userRepo.NewUserRepository(dbConn)
 	projectRepo := projectRepo.NewProjectRepository(dbConn)
+	errorRepo := errorRepo.NewErrorRepository(dbConn)
 
 	userService := userServ.NewUserService(userRepo)
 	projectService := projectServ.NewProjectService(projectRepo)
+	errorService := errorServ.NewErrorService(errorRepo)
 
 	userHandler := userH.NewUserHandler(userService)
 	projectHandler := projectH.NewProjectHandler(projectService)
+	errorHandler := errorH.NewErrorHandler(errorService)
 
-	router := router.SetupRouter(userHandler, projectHandler)
+	router := router.SetupRouter(userHandler, projectHandler, errorHandler)
 	if err := http.ListenAndServe(":8080", router); err != nil {
 		log.Fatalf("Failed to start server: %v", err)
 	}
