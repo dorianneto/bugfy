@@ -18,6 +18,7 @@
 
 # Go workspace file
 go.work
+tmp/
 
 # Dependency directories
 vendor/
@@ -34,3 +35,6 @@ vendor/
 
 # Logs
 *.log
+
+# Database
+data/

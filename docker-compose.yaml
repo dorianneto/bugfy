@@ -1,0 +1,27 @@
+services:
+  database:
+    container_name: "bugfyDatabase"
+    image: mongodb/mongodb-community-server:7.0-ubi8
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=default
+      - MONGO_INITDB_ROOT_PASSWORD=password
+    ports:
+      - "27017:27017"
+    volumes:
+      - type: bind
+        source: ./server/data
+        target: /data/db
+    restart: unless-stopped
+
+  server:
+    container_name: "bugfyServer"
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    volumes:
+      - ./server/:/app
+    ports:
+      - 8080:8080
+    depends_on:
+      - database
+    restart: unless-stopped
