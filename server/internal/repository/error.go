@@ -42,3 +42,14 @@ func (r *ErrorRepository) CreateError(ctx context.Context, e *Error) (*Error, er
 
 	return e, nil
 }
+
+func (r *ErrorRepository) DeleteError(ctx context.Context, id bson.ObjectID) error {
+	coll := r.db.Database("portobello").Collection(ERROR_COLLECTION)
+
+	_, err := coll.DeleteOne(ctx, bson.D{{Key: "_id", Value: id}})
+	if err != nil {
+		return fmt.Errorf("failed to delete error: %s", err)
+	}
+
+	return nil
+}

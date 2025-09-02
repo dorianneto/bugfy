@@ -34,10 +34,12 @@ func main() {
 	userRepo := repo.NewUserRepository(dbConn)
 	projectRepo := repo.NewProjectRepository(dbConn)
 	errorRepo := repo.NewErrorRepository(dbConn)
+	issueRepo := repo.NewIssueRepository(dbConn)
 
 	userService := service.NewUserService(userRepo)
 	projectService := service.NewProjectService(projectRepo)
-	errorService := service.NewErrorService(errorRepo)
+	issueService := service.NewIssueService(issueRepo)
+	errorService := service.NewErrorService(errorRepo, issueService)
 
 	userHandler := handler.NewUserHandler(userService)
 	projectHandler := handler.NewProjectHandler(projectService)

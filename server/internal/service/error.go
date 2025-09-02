@@ -13,14 +13,16 @@ import (
 )
 
 type ErrorService struct {
-	errorRepo *repo.ErrorRepository
-	timeout   time.Duration
+	errorRepo    *repo.ErrorRepository
+	issueService *IssueService
+	timeout      time.Duration
 }
 
-func NewErrorService(errorRepo *repo.ErrorRepository) *ErrorService {
+func NewErrorService(errorRepo *repo.ErrorRepository, issueService *IssueService) *ErrorService {
 	return &ErrorService{
-		errorRepo: errorRepo,
-		timeout:   time.Duration(2) * time.Second,
+		errorRepo:    errorRepo,
+		issueService: issueService,
+		timeout:      time.Duration(2) * time.Second,
 	}
 }
 
@@ -51,7 +53,13 @@ func (s *ErrorService) CreateError(ctx context.Context, req model.RequestCreateE
 		return nil, fmt.Errorf("failed to create error: %v", err)
 	}
 
-	log.Printf("ErrorService.CreateError - Project created successfully in database: %s", e.ID.String())
+	log.Printf("ErrorService.CreateError - Error created successfully in database: %s", e.ID.String())
+
+	err = s.issueService.GroupError(ctx, e)
+	if err != nil {
+		s.errorRepo.DeleteError(ctx, e.ID)
+		return nil, fmt.Errorf("failed to group error: %v", err)
+	}
 
 	return &model.ResponseCreateError{
 		ID:          e.ID.String(),
