@@ -6,7 +6,7 @@ services:
       - MONGO_INITDB_ROOT_USERNAME=default
       - MONGO_INITDB_ROOT_PASSWORD=password
     ports:
-      - "27017:27017"
+      - 27018:27017
     volumes:
       - type: bind
         source: ./server/data

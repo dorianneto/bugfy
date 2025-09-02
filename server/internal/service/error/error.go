@@ -8,6 +8,7 @@ import (
 
 	model "github.com/dorianneto/bugfy/internal/api/model"
 	repo "github.com/dorianneto/bugfy/internal/repository/error"
+	"github.com/dorianneto/bugfy/util"
 	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
@@ -36,13 +37,13 @@ func (s *ErrorService) CreateError(ctx context.Context, req model.RequestCreateE
 	}
 
 	p := &repo.Error{
-		ProjectID: pID,
-		Message:   req.Message,
-		Type:      "error",
-		// Fingerprint: ,
-		Context:   req.Context,
-		Timestamp: time.Now(),
-		Count:     1,
+		ProjectID:   pID,
+		Message:     req.Message,
+		Type:        "error",
+		Fingerprint: util.GenerateFingerprint(req.Message),
+		Context:     req.Context,
+		Timestamp:   time.Now(),
+		Count:       1,
 	}
 
 	e, err := s.errorRepo.CreateError(ctx, p)
@@ -54,11 +55,12 @@ func (s *ErrorService) CreateError(ctx context.Context, req model.RequestCreateE
 	log.Printf("ErrorService.CreateError - Project created successfully in database: %s", e.ID.String())
 
 	return &model.ResponseCreateError{
-		ID:        e.ID.String(),
-		ProjectID: e.ProjectID.String(),
-		Message:   e.Message,
-		Type:      e.Type,
-		Context:   e.Context,
-		Timestamp: e.Timestamp,
+		ID:          e.ID.String(),
+		ProjectID:   e.ProjectID.String(),
+		Fingerprint: e.Fingerprint,
+		Message:     e.Message,
+		Type:        e.Type,
+		Context:     e.Context,
+		Timestamp:   e.Timestamp,
 	}, nil
 }
