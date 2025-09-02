@@ -7,7 +7,7 @@ import (
 	"time"
 
 	model "github.com/dorianneto/bugfy/internal/api/model"
-	repo "github.com/dorianneto/bugfy/internal/repository/error"
+	repo "github.com/dorianneto/bugfy/internal/repository"
 	"github.com/dorianneto/bugfy/util"
 	"go.mongodb.org/mongo-driver/v2/bson"
 )

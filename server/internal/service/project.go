@@ -7,7 +7,7 @@ import (
 	"time"
 
 	model "github.com/dorianneto/bugfy/internal/api/model"
-	repo "github.com/dorianneto/bugfy/internal/repository/project"
+	repo "github.com/dorianneto/bugfy/internal/repository"
 )
 
 type ProjectService struct {

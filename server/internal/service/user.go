@@ -7,7 +7,7 @@ import (
 	"time"
 
 	model "github.com/dorianneto/bugfy/internal/api/model"
-	repo "github.com/dorianneto/bugfy/internal/repository/user"
+	repo "github.com/dorianneto/bugfy/internal/repository"
 	"github.com/dorianneto/bugfy/util"
 	"github.com/golang-jwt/jwt/v5"
 )

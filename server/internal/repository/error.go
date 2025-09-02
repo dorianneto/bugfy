@@ -9,7 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
-const COLLECTION = "errors"
+const ERROR_COLLECTION = "errors"
 
 // TODO: Add stack trace to error struct
 type Error struct {
@@ -32,7 +32,7 @@ func NewErrorRepository(db *mongo.Client) *ErrorRepository {
 }
 
 func (r *ErrorRepository) CreateError(ctx context.Context, e *Error) (*Error, error) {
-	coll := r.db.Database("portobello").Collection(COLLECTION)
+	coll := r.db.Database("portobello").Collection(ERROR_COLLECTION)
 
 	result, err := coll.InsertOne(ctx, e)
 	if err != nil {

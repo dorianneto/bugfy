@@ -10,7 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
-const COLLECTION = "projects"
+const PROJECT_COLLECTION = "projects"
 
 type Project struct {
 	ID        bson.ObjectID `bson:"_id,omitempty"`
@@ -44,7 +44,7 @@ func NewProjectRepository(db *mongo.Client) *ProjectRepository {
 // }
 
 func (r *ProjectRepository) CreateProject(ctx context.Context, project *Project) (*Project, error) {
-	coll := r.db.Database("portobello").Collection(COLLECTION)
+	coll := r.db.Database("portobello").Collection(PROJECT_COLLECTION)
 
 	opts := options.FindOneAndUpdate().SetUpsert(true).SetReturnDocument(options.After)
 	filter := bson.D{{Key: "title", Value: project.Title}}

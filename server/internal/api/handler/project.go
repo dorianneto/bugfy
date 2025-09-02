@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/dorianneto/bugfy/internal/api/model"
-	service "github.com/dorianneto/bugfy/internal/service/project"
+	service "github.com/dorianneto/bugfy/internal/service"
 	"github.com/dorianneto/bugfy/util"
 )
 

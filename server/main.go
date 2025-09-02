@@ -7,15 +7,9 @@ import (
 	"net/http"
 
 	"github.com/dorianneto/bugfy/db"
-	errorH "github.com/dorianneto/bugfy/internal/api/handler/error"
-	projectH "github.com/dorianneto/bugfy/internal/api/handler/project"
-	userH "github.com/dorianneto/bugfy/internal/api/handler/user"
-	errorRepo "github.com/dorianneto/bugfy/internal/repository/error"
-	projectRepo "github.com/dorianneto/bugfy/internal/repository/project"
-	userRepo "github.com/dorianneto/bugfy/internal/repository/user"
-	errorServ "github.com/dorianneto/bugfy/internal/service/error"
-	projectServ "github.com/dorianneto/bugfy/internal/service/project"
-	userServ "github.com/dorianneto/bugfy/internal/service/user"
+	handler "github.com/dorianneto/bugfy/internal/api/handler"
+	repo "github.com/dorianneto/bugfy/internal/repository"
+	service "github.com/dorianneto/bugfy/internal/service"
 	"github.com/dorianneto/bugfy/router"
 	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/v2/mongo/readpref"
@@ -37,17 +31,17 @@ func main() {
 	}
 	log.Println("Pinged your deployment. You are successfully connected!")
 
-	userRepo := userRepo.NewUserRepository(dbConn)
-	projectRepo := projectRepo.NewProjectRepository(dbConn)
-	errorRepo := errorRepo.NewErrorRepository(dbConn)
+	userRepo := repo.NewUserRepository(dbConn)
+	projectRepo := repo.NewProjectRepository(dbConn)
+	errorRepo := repo.NewErrorRepository(dbConn)
 
-	userService := userServ.NewUserService(userRepo)
-	projectService := projectServ.NewProjectService(projectRepo)
-	errorService := errorServ.NewErrorService(errorRepo)
+	userService := service.NewUserService(userRepo)
+	projectService := service.NewProjectService(projectRepo)
+	errorService := service.NewErrorService(errorRepo)
 
-	userHandler := userH.NewUserHandler(userService)
-	projectHandler := projectH.NewProjectHandler(projectService)
-	errorHandler := errorH.NewErrorHandler(errorService)
+	userHandler := handler.NewUserHandler(userService)
+	projectHandler := handler.NewProjectHandler(projectService)
+	errorHandler := handler.NewErrorHandler(errorService)
 
 	router := router.SetupRouter(userHandler, projectHandler, errorHandler)
 	if err := http.ListenAndServe(":8080", router); err != nil {
