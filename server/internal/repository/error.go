@@ -20,7 +20,6 @@ type Error struct {
 	Fingerprint string            `bson:"fingerprint,omitempty"`
 	Context     map[string]string `bson:"context,omitempty"`
 	Timestamp   time.Time         `bson:"timestamp,omitempty"`
-	Count       int               `bson:"count,omitempty"`
 }
 
 type ErrorRepository struct {

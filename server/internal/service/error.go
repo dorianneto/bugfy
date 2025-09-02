@@ -43,7 +43,6 @@ func (s *ErrorService) CreateError(ctx context.Context, req model.RequestCreateE
 		Fingerprint: util.GenerateFingerprint(req.Message),
 		Context:     req.Context,
 		Timestamp:   time.Now(),
-		Count:       1,
 	}
 
 	e, err := s.errorRepo.CreateError(ctx, p)
