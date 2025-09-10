@@ -8,15 +8,18 @@ import (
 	"github.com/dorianneto/bugfy/internal/api/model"
 	service "github.com/dorianneto/bugfy/internal/service"
 	"github.com/dorianneto/bugfy/util"
+	"github.com/go-chi/chi/v5"
 )
 
 type ProjectHandler struct {
 	projectService *service.ProjectService
+	issueService   *service.IssueService
 }
 
-func NewProjectHandler(projectService *service.ProjectService) *ProjectHandler {
+func NewProjectHandler(projectService *service.ProjectService, issueService *service.IssueService) *ProjectHandler {
 	return &ProjectHandler{
 		projectService: projectService,
+		issueService:   issueService,
 	}
 }
 
@@ -40,4 +43,21 @@ func (h *ProjectHandler) CreateProject(w http.ResponseWriter, r *http.Request) {
 	log.Printf("CreateProject - Success: project created with ID=%s, title=%s", project.ID, project.Title)
 
 	util.WriteJSON(w, http.StatusCreated, project)
+}
+
+func (h *ProjectHandler) GetIssues(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+
+	log.Printf("GetIssues - Request received: id=%s", id)
+
+	issues, err := h.issueService.GetIssues(r.Context(), id)
+	if err != nil {
+		log.Printf("GetIssues - Service error: %v", err)
+		util.WriteError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	log.Printf("GetIssues - Success: issues fetched from ID=%s", id)
+
+	util.WriteJSON(w, http.StatusCreated, issues)
 }

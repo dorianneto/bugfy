@@ -42,7 +42,7 @@ func main() {
 	errorService := service.NewErrorService(errorRepo, issueService)
 
 	userHandler := handler.NewUserHandler(userService)
-	projectHandler := handler.NewProjectHandler(projectService)
+	projectHandler := handler.NewProjectHandler(projectService, issueService)
 	errorHandler := handler.NewErrorHandler(errorService)
 
 	router := router.SetupRouter(userHandler, projectHandler, errorHandler)

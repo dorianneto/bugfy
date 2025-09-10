@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/dorianneto/bugfy/internal/api/model"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
@@ -12,23 +13,15 @@ import (
 
 const ISSUE_COLLECTION = "issues"
 
-type IssueState int
-
-const (
-	StateUnresolved IssueState = iota
-	StateResolved
-	StateIgnored
-)
-
 type Issue struct {
-	ID          bson.ObjectID `bson:"_id,omitempty"`
-	ProjectID   bson.ObjectID `bson:"project_id,omitempty"`
-	Title       string        `bson:"title,omitempty"`
-	Fingerprint string        `bson:"fingerprint,omitempty"`
-	Count       int           `bson:"count"`
-	FirstSeen   time.Time     `bson:"first_seen,omitempty"`
-	LastSeen    time.Time     `bson:"last_seen,omitempty"`
-	Status      IssueState    `bson:"status"`
+	ID          bson.ObjectID    `bson:"_id,omitempty"`
+	ProjectID   bson.ObjectID    `bson:"project_id,omitempty"`
+	Title       string           `bson:"title,omitempty"`
+	Fingerprint string           `bson:"fingerprint,omitempty"`
+	Count       int              `bson:"count"`
+	FirstSeen   time.Time        `bson:"first_seen,omitempty"`
+	LastSeen    time.Time        `bson:"last_seen,omitempty"`
+	Status      model.IssueState `bson:"status"`
 }
 
 type IssueRepository struct {
@@ -80,4 +73,27 @@ func (r *IssueRepository) UpsertIssue(ctx context.Context, issue *Issue) (*Issue
 	}
 
 	return &i, nil
+}
+
+func (r *IssueRepository) FindIssuesByProject(ctx context.Context, projectId string) ([]Issue, error) {
+	coll := r.db.Database("portobello").Collection(ISSUE_COLLECTION)
+
+	d, err := bson.ObjectIDFromHex(projectId)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch issues: %s", err)
+	}
+
+	result, err := coll.Find(ctx, bson.D{{Key: "project_id", Value: d}})
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch issues: %s", err)
+	}
+
+	var i []Issue
+
+	err = result.All(ctx, &i)
+	if err != nil {
+		return nil, fmt.Errorf("failed to decode issues: %s", err)
+	}
+
+	return i, nil
 }

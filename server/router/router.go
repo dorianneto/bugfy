@@ -37,15 +37,12 @@ func SetupRouter(userHandler *handler.UserHandler, projectHandler *handler.Proje
 	})
 
 	r.Route("/api/projects", func(u chi.Router) {
-		u.Group(func(r chi.Router) {
-			r.Post("/", projectHandler.CreateProject)
-		})
+		u.Post("/", projectHandler.CreateProject)
+		u.Get("/{id}/issues", projectHandler.GetIssues)
 	})
 
 	r.Route("/api/errors", func(u chi.Router) {
-		u.Group(func(r chi.Router) {
-			r.Post("/", errorHandler.CreateError)
-		})
+		u.Post("/", errorHandler.CreateError)
 	})
 
 	r.Get("/health", func(w http.ResponseWriter, _ *http.Request) {

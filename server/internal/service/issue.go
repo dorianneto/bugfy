@@ -6,6 +6,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/dorianneto/bugfy/internal/api/model"
 	repo "github.com/dorianneto/bugfy/internal/repository"
 )
 
@@ -36,7 +37,7 @@ func (s *IssueService) GroupError(ctx context.Context, e *repo.Error) error {
 		Count:       1,
 		FirstSeen:   e.Timestamp,
 		LastSeen:    e.Timestamp,
-		Status:      repo.StateUnresolved,
+		Status:      model.IssueStateUnresolved,
 	}
 
 	i, err := s.issueRepo.FindIssue(ctx, e.Fingerprint)
@@ -59,4 +60,32 @@ func (s *IssueService) GroupError(ctx context.Context, e *repo.Error) error {
 	}
 
 	return nil
+}
+
+func (s *IssueService) GetIssues(ctx context.Context, projectId string) ([]model.ResponseGetIssues, error) {
+	ctx, cancel := context.WithTimeout(ctx, s.timeout)
+	defer cancel()
+
+	i, err := s.issueRepo.FindIssuesByProject(ctx, projectId)
+	if err != nil {
+		log.Printf("IssueService.GetIssues - Database error: %v", err)
+		return nil, fmt.Errorf("failed to fetch issues: %v", err)
+	}
+
+	issues := make([]model.ResponseGetIssues, 0, len(i))
+
+	for _, issue := range i {
+		issues = append(issues, model.ResponseGetIssues{
+			ID:          issue.ID.Hex(),
+			ProjectID:   issue.ProjectID.Hex(),
+			Title:       issue.Title,
+			Fingerprint: issue.Fingerprint,
+			Count:       issue.Count,
+			FirstSeen:   issue.FirstSeen,
+			LastSeen:    issue.LastSeen,
+			Status:      issue.Status,
+		})
+	}
+
+	return issues, nil
 }
