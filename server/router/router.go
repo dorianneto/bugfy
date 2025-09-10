@@ -17,7 +17,7 @@ func SetupRouter(userHandler *handler.UserHandler, projectHandler *handler.Proje
 	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)
 	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:3000", "http://127.0.0.1:3000"},
+		AllowedOrigins:   []string{"http://localhost:5173", "http://127.0.0.1:5173"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		ExposedHeaders:   []string{"Link"},

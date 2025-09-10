@@ -9,7 +9,7 @@ import {
   CodeIcon,
   XIcon,
 } from "lucide-react";
-import { Dialog, Select } from "@radix-ui/themes";
+import { Dialog, Select } from "radix-ui";
 
 // Types
 interface Issue {
@@ -98,7 +98,7 @@ export default function Issues() {
   const [loading, setLoading] = useState(true);
   const [loadingDetails, setLoadingDetails] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [projectId, setProjectId] = useState("demo-project");
+  const [projectId, setProjectId] = useState("68b5d94c6be8439becd70248");
   const [statusFilter, setStatusFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -197,7 +197,56 @@ export default function Issues() {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Status
             </label>
-            {/* SELECT */}
+            <Select.Root value={statusFilter} onValueChange={setStatusFilter}>
+              <Select.Trigger className="inline-flex items-center justify-between w-full px-3 py-2 text-sm bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <Select.Value />
+                <Select.Icon>
+                  <ChevronDownIcon className="w-4 h-4" />
+                </Select.Icon>
+              </Select.Trigger>
+              <Select.Portal>
+                <Select.Content className="overflow-hidden bg-white rounded-md shadow-lg border border-gray-200 z-50">
+                  <Select.Viewport className="p-1">
+                    <Select.Item
+                      value="all"
+                      className="relative flex items-center px-8 py-2 text-sm rounded hover:bg-gray-100 cursor-default select-none"
+                    >
+                      <Select.ItemText>All Statuses</Select.ItemText>
+                      <Select.ItemIndicator className="absolute left-2">
+                        <CheckIcon className="w-4 h-4" />
+                      </Select.ItemIndicator>
+                    </Select.Item>
+                    <Select.Item
+                      value="unresolved"
+                      className="relative flex items-center px-8 py-2 text-sm rounded hover:bg-gray-100 cursor-default select-none"
+                    >
+                      <Select.ItemText>Unresolved</Select.ItemText>
+                      <Select.ItemIndicator className="absolute left-2">
+                        <CheckIcon className="w-4 h-4" />
+                      </Select.ItemIndicator>
+                    </Select.Item>
+                    <Select.Item
+                      value="resolved"
+                      className="relative flex items-center px-8 py-2 text-sm rounded hover:bg-gray-100 cursor-default select-none"
+                    >
+                      <Select.ItemText>Resolved</Select.ItemText>
+                      <Select.ItemIndicator className="absolute left-2">
+                        <CheckIcon className="w-4 h-4" />
+                      </Select.ItemIndicator>
+                    </Select.Item>
+                    <Select.Item
+                      value="ignored"
+                      className="relative flex items-center px-8 py-2 text-sm rounded hover:bg-gray-100 cursor-default select-none"
+                    >
+                      <Select.ItemText>Ignored</Select.ItemText>
+                      <Select.ItemIndicator className="absolute left-2">
+                        <CheckIcon className="w-4 h-4" />
+                      </Select.ItemIndicator>
+                    </Select.Item>
+                  </Select.Viewport>
+                </Select.Content>
+              </Select.Portal>
+            </Select.Root>
           </div>
 
           {/* Search */}
@@ -298,7 +347,169 @@ export default function Issues() {
           )}
         </>
       )}
-      {/* DIALOG */}
+
+      {/* Issue Details Modal */}
+      <Dialog.Root open={dialogOpen} onOpenChange={setDialogOpen}>
+        <Dialog.Portal>
+          <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-50 z-40" />
+          <Dialog.Content className="fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] bg-white rounded-lg shadow-xl z-50 w-full max-w-4xl max-h-[90vh] overflow-hidden">
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <Dialog.Title className="text-xl font-semibold text-gray-900">
+                Issue Details
+              </Dialog.Title>
+              <Dialog.Close className="p-2 text-gray-400 hover:text-gray-600 transition-colors">
+                <XIcon className="w-5 h-5" />
+              </Dialog.Close>
+            </div>
+
+            <div className="p-6 overflow-y-auto max-h-[calc(90vh-80px)]">
+              {selectedIssue && (
+                <div className="space-y-6">
+                  {/* Issue Summary */}
+                  <div>
+                    <h2 className="text-lg font-semibold text-red-600 mb-2">
+                      {selectedIssue.title}
+                    </h2>
+                    <div className="flex items-center gap-2 mb-4">
+                      <span
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusColor(
+                          selectedIssue.status
+                        )}`}
+                      >
+                        {selectedIssue.count} occurrences
+                      </span>
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 border border-gray-300">
+                        {selectedIssue.status}
+                      </span>
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 border border-blue-300">
+                        Project: {selectedIssue.project_id}
+                      </span>
+                    </div>
+                    <div className="text-sm text-gray-600 space-y-1">
+                      <div className="font-mono bg-gray-100 px-2 py-1 rounded text-xs">
+                        Fingerprint: {selectedIssue.fingerprint}
+                      </div>
+                    </div>
+                  </div>
+
+                  {loadingDetails ? (
+                    <div className="flex items-center justify-center py-8">
+                      <RefreshCwIcon className="w-6 h-6 animate-spin text-blue-600" />
+                    </div>
+                  ) : (
+                    errorDetails.length > 0 && (
+                      <>
+                        {/* Stack Trace */}
+                        {errorDetails[0].stack_trace &&
+                          errorDetails[0].stack_trace.length > 0 && (
+                            <div>
+                              <h3 className="flex items-center text-lg font-semibold mb-3">
+                                <CodeIcon className="w-5 h-5 mr-2" />
+                                Stack Trace
+                              </h3>
+                              <div className="bg-gray-50 rounded-md p-4 space-y-2">
+                                {errorDetails[0].stack_trace.map(
+                                  (frame, index) => (
+                                    <div
+                                      key={index}
+                                      className="border-l-2 border-gray-300 pl-4"
+                                    >
+                                      <div className="font-mono text-sm font-semibold text-gray-900">
+                                        {frame.function}
+                                      </div>
+                                      <div className="text-xs text-gray-500">
+                                        {frame.file}:{frame.line}
+                                      </div>
+                                    </div>
+                                  )
+                                )}
+                              </div>
+                            </div>
+                          )}
+
+                        {/* Context */}
+                        {errorDetails[0].context &&
+                          Object.keys(errorDetails[0].context).length > 0 && (
+                            <div>
+                              <h3 className="text-lg font-semibold mb-3">
+                                Context
+                              </h3>
+                              <div className="bg-gray-50 rounded-md p-4 space-y-2">
+                                {Object.entries(errorDetails[0].context).map(
+                                  ([key, value]) => (
+                                    <div key={key} className="flex gap-2">
+                                      <span className="font-mono text-sm font-semibold text-gray-700 min-w-0 flex-shrink-0">
+                                        {key}:
+                                      </span>
+                                      <span className="font-mono text-sm text-gray-600 break-all">
+                                        {value}
+                                      </span>
+                                    </div>
+                                  )
+                                )}
+                              </div>
+                            </div>
+                          )}
+
+                        {/* Recent Events */}
+                        <div>
+                          <h3 className="flex items-center text-lg font-semibold mb-3">
+                            <CalendarIcon className="w-5 h-5 mr-2" />
+                            Recent Events ({errorDetails.length})
+                          </h3>
+                          <div className="space-y-3">
+                            {errorDetails.slice(0, 10).map((errorEvent) => (
+                              <div
+                                key={errorEvent.id}
+                                className="border border-gray-200 rounded-md p-4"
+                              >
+                                <div className="flex items-center justify-between mb-2">
+                                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 border border-gray-300">
+                                    {errorEvent.count} times
+                                  </span>
+                                  <span className="text-sm text-gray-500">
+                                    {new Date(
+                                      errorEvent.timestamp
+                                    ).toLocaleString()}
+                                  </span>
+                                </div>
+                                {errorEvent.context &&
+                                  Object.keys(errorEvent.context).length >
+                                    0 && (
+                                    <div className="text-xs text-gray-500 space-y-1">
+                                      {Object.entries(errorEvent.context).map(
+                                        ([key, value]) => (
+                                          <div key={key}>
+                                            <span className="font-semibold">
+                                              {key}:
+                                            </span>{" "}
+                                            {value}
+                                          </div>
+                                        )
+                                      )}
+                                    </div>
+                                  )}
+                              </div>
+                            ))}
+
+                            {errorDetails.length > 10 && (
+                              <div className="text-center">
+                                <p className="text-sm text-gray-500">
+                                  Showing 10 of {errorDetails.length} events
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </>
+                    )
+                  )}
+                </div>
+              )}
+            </div>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
     </div>
   );
 }
