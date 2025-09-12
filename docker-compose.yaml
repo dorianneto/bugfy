@@ -25,3 +25,17 @@ services:
     depends_on:
       - database
     restart: unless-stopped
+
+  client:
+    container_name: "bugfyClient"
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    volumes:
+      - ./client/:/app
+      - /app/node_modules
+    ports:
+      - 5173:5173
+    depends_on:
+      - server
+    restart: unless-stopped

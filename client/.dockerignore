@@ -1,0 +1,6 @@
+# Ignore common development files and directories
+node_modules/
+.git/
+.vscode/
+*.log
+tmp/
